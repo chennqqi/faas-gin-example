@@ -42,6 +42,8 @@ func (self *ginHandle) ServeHandle(faasReq handler.Request) (handler.Response, e
 	var body *bytes.Buffer
 	if len(faasReq.Body) > 0 {
 		body = bytes.NewBuffer(faasReq.Body)
+	} else {
+		body = nil
 	}
 	route := faasReq.Header.Get(DefaultRouteKey)
 	url := fmt.Sprintf("http://%s%s?%s", DefaultRouteHost, route, faasReq.QueryString)
@@ -60,11 +62,11 @@ func (self *ginHandle) ServeHandle(faasReq handler.Request) (handler.Response, e
 }
 
 //golang-http gin Wrapper
-func GinFaasHandler(engine *gin.Engine) func(faasReq handler.Request) (handler.Response, error) {
+func GinFaasHandler(engine *gin.Engine, faasReq handler.Request) (handler.Response, error) {
 	var h = &ginHandle{
 		engine: engine,
 	}
-	return h.ServeHandle
+	return h.ServeHandle(faasReq)
 }
 
 //golang-middleware gin Wrapper
